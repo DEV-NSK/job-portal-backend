@@ -9,24 +9,16 @@ dotenv.config();
 
 const app = express();
 
-// CORS configuration for production
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'https://job-portal-frontend-blue-gamma.vercel.app'
-];
-
+// CORS configuration - allow all vercel.app deployments + localhost
 app.use(cors({ 
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
+    // Allow requests with no origin (curl, mobile apps, Postman)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      // For debugging - log the origin that's being rejected
-      console.log('CORS rejected origin:', origin);
-      callback(null, true); // Temporarily allow all origins for debugging
-    }
+    // Allow localhost for development
+    if (origin.startsWith('http://localhost')) return callback(null, true);
+    // Allow ALL vercel.app subdomains (covers every preview + production deployment)
+    if (origin.endsWith('.vercel.app')) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true 
 }));
