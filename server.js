@@ -9,7 +9,7 @@ dotenv.config();
 
 const app = express();
 
-// CORS configuration - allow all vercel.app deployments + localhost
+// CORS configuration - allow all vercel.app deployments + render.com + localhost
 app.use(cors({ 
   origin: function (origin, callback) {
     // Allow requests with no origin (curl, mobile apps, Postman)
@@ -18,6 +18,8 @@ app.use(cors({
     if (origin.startsWith('http://localhost')) return callback(null, true);
     // Allow ALL vercel.app subdomains (covers every preview + production deployment)
     if (origin.endsWith('.vercel.app')) return callback(null, true);
+    // Allow Render.com deployments
+    if (origin.endsWith('.onrender.com')) return callback(null, true);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true 
