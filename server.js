@@ -23,7 +23,9 @@ app.use(cors({
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      // For debugging - log the origin that's being rejected
+      console.log('CORS rejected origin:', origin);
+      callback(null, true); // Temporarily allow all origins for debugging
     }
   },
   credentials: true 
