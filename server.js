@@ -27,26 +27,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Database connection middleware for serverless
-app.use(async (req, res, next) => {
-  try {
-    if (process.env.MONGO_URI && !process.env.MONGO_URI.includes('localhost')) {
-      await connectDB();
-    } else if (!process.env.MONGO_URI || process.env.MONGO_URI.includes('localhost')) {
-      return res.status(503).json({ 
-        message: 'Database not configured. Please set MONGO_URI environment variable in Vercel dashboard.',
-        hint: 'Use MongoDB Atlas connection string'
-      });
-    }
-    next();
-  } catch (error) {
-    console.error('Database connection failed:', error);
-    res.status(503).json({ 
-      message: 'Database connection failed',
-      error: error.message
-    });
-  }
-});
+// Connect to DB once at startup
+connectDB();
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
