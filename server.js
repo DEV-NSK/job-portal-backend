@@ -30,15 +30,20 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Database connection middleware for serverless
 app.use(async (req, res, next) => {
   try {
-    if (process.env.MONGO_URI) {
+    if (process.env.MONGO_URI && !process.env.MONGO_URI.includes('localhost')) {
       await connectDB();
+    } else if (!process.env.MONGO_URI || process.env.MONGO_URI.includes('localhost')) {
+      return res.status(503).json({ 
+        message: 'Database not configured. Please set MONGO_URI environment variable in Vercel dashboard.',
+        hint: 'Use MongoDB Atlas connection string'
+      });
     }
     next();
   } catch (error) {
     console.error('Database connection failed:', error);
-    res.status(500).json({ 
+    res.status(503).json({ 
       message: 'Database connection failed',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 });
