@@ -22,8 +22,12 @@ const userSchema = new mongoose.Schema({
   education: [{
     degree: String,
     institution: String,
-    year: String
-  }]
+    year: String,
+    description: String
+  }],
+  // Employer approval flow
+  isApproved: { type: Boolean, default: true }, // false for employers until admin approves
+  approvalStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'approved' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
