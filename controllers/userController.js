@@ -46,7 +46,7 @@ const updateProfile = async (req, res) => {
     
     // Separate employer-specific fields from user fields
     const employerFields = [
-      'companyName', 'industry', 'companySize', 'website', 'description', 
+      'companyName', 'companyLogo', 'industry', 'companySize', 'website', 'description', 
       'culture', 'benefits', 'founded'
     ];
     
@@ -81,10 +81,26 @@ const updateProfile = async (req, res) => {
         employerData.location = userData.location;
       }
       
+      // Sync avatar to companyLogo for employers
+      if (userData.avatar) {
+        employerData.companyLogo = userData.avatar;
+      }
+      
       try {
         await Employer.findOneAndUpdate(
           { userId: req.user._id },
           employerData,
+          { upsert: true, new: true }
+        );
+      } catch (employerError) {
+        // Don't fail the entire request if employer update fails
+      }
+    } else if (req.user.role === 'employer' && userData.avatar) {
+      // If only avatar was updated (no other employer fields), still sync it to companyLogo
+      try {
+        await Employer.findOneAndUpdate(
+          { userId: req.user._id },
+          { companyLogo: userData.avatar },
           { upsert: true, new: true }
         );
       } catch (employerError) {
