@@ -16,10 +16,10 @@ const updateProfile = async (req, res) => {
   try {
     const updates = { ...req.body };
     
-    // Handle file upload
+    // Handle file upload — Cloudinary returns req.file.path (full URL), disk returns filename
     if (req.file) {
       const field = req.file.fieldname === 'resume' ? 'resume' : 'avatar';
-      updates[field] = `/uploads/${req.file.filename}`;
+      updates[field] = req.file.path || `/uploads/${req.file.filename}`;
     }
     
     // Parse JSON fields

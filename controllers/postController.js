@@ -6,7 +6,7 @@ const createPost = async (req, res) => {
     const post = await Post.create({
       author: req.user._id,
       content: req.body.content,
-      image: req.file ? `/uploads/${req.file.filename}` : ''
+      image: req.file ? (req.file.path || `/uploads/${req.file.filename}`) : ''
     });
     await post.populate('author', 'name avatar role');
     res.status(201).json(post);
